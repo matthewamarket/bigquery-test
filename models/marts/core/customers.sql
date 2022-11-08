@@ -10,6 +10,21 @@ orders as (
 
 ),
 
+payments as (
+
+    select * from {{ref('stg_payments')}}
+
+),
+
+customer_payments as (
+    select
+        orders.customer_id,
+        sum(amount) as total_amount
+    from payments
+    left join orders on payments.order_id = orders.order_id
+    group by 1
+),
+
 customer_orders as (
 
     select
@@ -33,12 +48,12 @@ final as (
         customers.last_name,
         customer_orders.first_order_date,
         customer_orders.most_recent_order_date,
-        coalesce(customer_orders.number_of_orders, 0) as number_of_orders
-
+        coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
+        
     from customers
-
     left join customer_orders using (customer_id)
-
+    left join customer_payments
+        on  customers.customer_id = customer_payments.customer_id
 )
 
 select * from final
