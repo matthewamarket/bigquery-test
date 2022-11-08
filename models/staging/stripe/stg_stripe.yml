@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_payments
+    description: Staged customer data from stripe. This model cleans up payment data. One unique payment per row.
+    columns: 
+      - name: payment_id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: payment_method
+        description: '{{doc("payment_method")}}'
+        tests:
+          - accepted_values:
+              values: ['credit_card','bank_transfer','coupon','gift_card']
